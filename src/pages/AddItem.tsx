@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-const API = "http://localhost:5000/api";
+const API = "https://katata-rasata-backend.onrender.com/api";
 const CATEGORIES = ["BEVERAGE", "FOOD", "DESSERT", "SNACK", "OTHER"];
 const ITEMS_PER_PAGE = 8; // Adjust this number as needed
 

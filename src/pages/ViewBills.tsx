@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-const API = "http://localhost:5000/api";
+const API = "https://katata-rasata-backend.onrender.com/api";
 
 export default function ViewBills() {
   const [bills, setBills] = useState<any[]>([]);
