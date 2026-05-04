@@ -267,7 +267,7 @@ export default function Billing() {
         </div>
         <footer>
           <div className="text-center border-t border-black pt-4 mt-4">
-            <h1 className="text-xl font-bold uppercase">Thank You Visit Again</h1>
+            <h1 className="text-xl font-bold uppercase">Thank You Visit Again!</h1>
             <p className="text-xs">Powered by Trovix Tech</p>
             <p className="text-xs">0756519837/0764726820</p>
             <p className="text-xs">Copyright &copy; {new Date().getFullYear()}</p>
