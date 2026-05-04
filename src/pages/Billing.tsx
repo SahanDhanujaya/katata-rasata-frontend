@@ -237,8 +237,10 @@ export default function Billing() {
 
       {/* ── PRINT STYLES & AREA (REMAINS SAME) ── */}
       <div className="hidden print:block print-area w-full p-8 bg-white text-black font-mono">
-        <div className="text-center border-b border-black pb-4 mb-4">
-          <h1 className="text-xl font-bold uppercase">Store Receipt</h1>
+        <div className="text-center border-b border-black pb-4 mb-4 border-dotted">
+          <h1 className="text-xl font-bold uppercase">කටට රසට</h1>
+          <p className="text-xs">Private Bustand - Panadura</p>
+          <span>072-2838281</span>
           <p className="text-xs">{new Date().toLocaleString()}</p>
         </div>
         <table className="w-full text-sm mb-4">
@@ -263,6 +265,14 @@ export default function Billing() {
           <span className="font-bold">TOTAL</span>
           <span className="text-xl font-bold">Rs.{total.toLocaleString()}</span>
         </div>
+        <footer>
+          <div className="text-center border-t border-black pt-4 mt-4">
+            <h1 className="text-xl font-bold uppercase">Thank You Visit Again</h1>
+            <p className="text-xs">Powered by Trovix Tech</p>
+            <p className="text-xs">0756519837/0764726820</p>
+            <p className="text-xs">Copyright &copy; {new Date().getFullYear()}</p>
+          </div>
+        </footer>
       </div>
 
       <style>{`
