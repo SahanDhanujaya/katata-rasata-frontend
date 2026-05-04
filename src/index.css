@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+@config "../tailwind.config.js"; /* This links your JS config to the v4 engine */
+
+/* Alternatively, in v4 you can define your dark mode strategy directly: */
+@theme {
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+}
+
+/* Ensure the dark strategy is set to class */
+@variant dark (&:where(.dark, .dark *));
