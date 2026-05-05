@@ -8,7 +8,7 @@ export default function ViewBills() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [totalRangeSales, setTotalRangeSales] = useState(0); // For total revenue across all pages
+  const [, setTotalRangeSales] = useState(0); // For total revenue across all pages
   const limit = 10;
 
   const today = new Date().toISOString().split("T")[0];
@@ -50,6 +50,7 @@ export default function ViewBills() {
 
   // Sync effect: Trigger whenever page changes
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchData(page);
   }, [page, fetchData]);
 
