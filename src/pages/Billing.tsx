@@ -23,17 +23,26 @@ export default function Billing() {
   const [loading, setLoading] = useState(false);
   // Track if mobile cart is visible
   const [showMobileCart, setShowMobileCart] = useState(false);
+  const generateInvoiceId = () => {
+    const datePart = new Date().getTime().toString().slice(-4);
+    // eslint-disable-next-line react-hooks/purity
+    const randomPart = Math.floor(1000 + Math.random() * 9000);
+    return `INV-${datePart}-${randomPart}`;
+  };
 
   useEffect(() => {
     axios.get(`${API}/items`).then((res) => setItems(res.data));
   }, []);
 
-  const categories = ["ALL", ...Array.from(new Set(items.map((i) => i.category)))];
+  const categories = [
+    "ALL",
+    ...Array.from(new Set(items.map((i) => i.category))),
+  ];
 
   const filtered = items.filter(
     (i) =>
       (activeCategory === "ALL" || i.category === activeCategory) &&
-      i.name.toLowerCase().includes(search.toLowerCase())
+      i.name.toLowerCase().includes(search.toLowerCase()),
   );
 
   const addToCart = (item: Item) => {
@@ -49,11 +58,12 @@ export default function Billing() {
     setCart((prev) =>
       prev
         .map((c) => (c._id === id ? { ...c, qty: c.qty + delta } : c))
-        .filter((c) => c.qty > 0)
+        .filter((c) => c.qty > 0),
     );
   };
 
-  const removeItem = (id: string) => setCart((prev) => prev.filter((c) => c._id !== id));
+  const removeItem = (id: string) =>
+    setCart((prev) => prev.filter((c) => c._id !== id));
 
   const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
   const itemCount = cart.reduce((sum, i) => sum + i.qty, 0);
@@ -73,9 +83,10 @@ export default function Billing() {
 
   return (
     <div className="flex flex-col lg:flex-row h-[calc(100vh-56px)] bg-zinc-950 text-zinc-100 overflow-hidden relative">
-
       {/* ── LEFT: Item Grid ── */}
-      <div className={`flex flex-1 flex-col overflow-hidden border-r border-white/10 print:hidden ${showMobileCart ? 'hidden lg:flex' : 'flex'}`}>
+      <div
+        className={`flex flex-1 flex-col overflow-hidden border-r border-white/10 print:hidden ${showMobileCart ? "hidden lg:flex" : "flex"}`}
+      >
         {/* Search + Categories */}
         <div className="border-b border-white/10 bg-zinc-900/60 px-4 py-3 space-y-3">
           <input
@@ -91,9 +102,10 @@ export default function Billing() {
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
                 className={`whitespace-nowrap rounded-full px-4 py-1.5 font-mono text-[10px] tracking-widest uppercase transition-all border
-                  ${activeCategory === cat
-                    ? "bg-amber-400 border-amber-400 text-zinc-900 font-bold"
-                    : "border-white/10 text-zinc-400"
+                  ${
+                    activeCategory === cat
+                      ? "bg-amber-400 border-amber-400 text-zinc-900 font-bold"
+                      : "border-white/10 text-zinc-400"
                   }`}
               >
                 {cat}
@@ -141,17 +153,23 @@ export default function Billing() {
       </div>
 
       {/* ── RIGHT: Bill Panel ── */}
-      <div className={`
-        ${showMobileCart ? 'flex' : 'hidden lg:flex'}
+      <div
+        className={`
+        ${showMobileCart ? "flex" : "hidden lg:flex"}
         fixed inset-0 z-[60] flex w-full flex-col bg-zinc-950 lg:relative lg:inset-auto lg:z-0 lg:w-80 lg:bg-zinc-900 print:hidden
-      `}>
+      `}
+      >
         {/* Mobile Close Header */}
         <div className="flex items-center justify-between border-b border-white/10 px-5 py-4 lg:py-4">
           <div>
-            <p className="font-mono text-[10px] tracking-widest text-zinc-500 uppercase">Current Bill</p>
-            <p className="font-mono text-xs text-zinc-400">{itemCount} items added</p>
+            <p className="font-mono text-[10px] tracking-widest text-zinc-500 uppercase">
+              Current Bill
+            </p>
+            <p className="font-mono text-xs text-zinc-400">
+              {itemCount} items added
+            </p>
           </div>
-          <button 
+          <button
             onClick={() => setShowMobileCart(false)}
             className="rounded border border-white/10 p-2 font-mono text-xs text-zinc-400 lg:hidden"
           >
@@ -163,22 +181,48 @@ export default function Billing() {
         <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2">
           {cart.length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center text-center opacity-30">
-              <p className="font-mono text-[10px] tracking-widest uppercase">Cart is empty</p>
+              <p className="font-mono text-[10px] tracking-widest uppercase">
+                Cart is empty
+              </p>
             </div>
           ) : (
             cart.map((c) => (
-              <div key={c._id} className="rounded-lg border border-white/10 bg-zinc-800/40 px-3 py-2.5">
+              <div
+                key={c._id}
+                className="rounded-lg border border-white/10 bg-zinc-800/40 px-3 py-2.5"
+              >
                 <div className="mb-2 flex items-start justify-between gap-2">
-                  <span className="font-mono text-xs text-zinc-200">{c.name}</span>
-                  <button onClick={() => removeItem(c._id)} className="text-zinc-600 hover:text-red-400">✕</button>
+                  <span className="font-mono text-xs text-zinc-200">
+                    {c.name}
+                  </span>
+                  <button
+                    onClick={() => removeItem(c._id)}
+                    className="text-zinc-600 hover:text-red-400"
+                  >
+                    ✕
+                  </button>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <button onClick={() => updateQty(c._id, -1)} className="flex h-7 w-7 items-center justify-center rounded-full border border-white/10 text-zinc-400">−</button>
-                    <span className="font-mono text-xs text-zinc-200">{c.qty}</span>
-                    <button onClick={() => updateQty(c._id, 1)} className="flex h-7 w-7 items-center justify-center rounded-full border border-white/10 text-zinc-400">+</button>
+                    <button
+                      onClick={() => updateQty(c._id, -1)}
+                      className="flex h-7 w-7 items-center justify-center rounded-full border border-white/10 text-zinc-400"
+                    >
+                      −
+                    </button>
+                    <span className="font-mono text-xs text-zinc-200">
+                      {c.qty}
+                    </span>
+                    <button
+                      onClick={() => updateQty(c._id, 1)}
+                      className="flex h-7 w-7 items-center justify-center rounded-full border border-white/10 text-zinc-400"
+                    >
+                      +
+                    </button>
                   </div>
-                  <span className="font-mono text-xs font-bold text-amber-400">Rs.{c.price * c.qty}</span>
+                  <span className="font-mono text-xs font-bold text-amber-400">
+                    Rs.{c.price * c.qty}
+                  </span>
                 </div>
               </div>
             ))
@@ -188,8 +232,12 @@ export default function Billing() {
         {/* Footer */}
         <div className="border-t border-white/10 bg-zinc-900/80 px-5 py-6 space-y-4 backdrop-blur-md">
           <div className="flex items-baseline justify-between">
-            <span className="font-mono text-[10px] tracking-widest text-zinc-500 uppercase">Total</span>
-            <span className="font-mono text-3xl font-bold text-amber-400">Rs.{total.toLocaleString()}</span>
+            <span className="font-mono text-[10px] tracking-widest text-zinc-500 uppercase">
+              Total
+            </span>
+            <span className="font-mono text-3xl font-bold text-amber-400">
+              Rs.{total.toLocaleString()}
+            </span>
           </div>
 
           {saved && (
@@ -228,9 +276,13 @@ export default function Billing() {
               <span className="flex h-6 w-6 items-center justify-center rounded bg-zinc-900 text-[10px] font-bold text-amber-400">
                 {itemCount}
               </span>
-              <span className="font-mono text-xs font-bold uppercase text-zinc-900">View Cart</span>
+              <span className="font-mono text-xs font-bold uppercase text-zinc-900">
+                View Cart
+              </span>
             </div>
-            <span className="font-mono text-sm font-bold text-zinc-900">Rs.{total.toLocaleString()}</span>
+            <span className="font-mono text-sm font-bold text-zinc-900">
+              Rs.{total.toLocaleString()}
+            </span>
           </button>
         </div>
       )}
@@ -242,6 +294,7 @@ export default function Billing() {
           <p className="text-xs">Private Bustand - Panadura</p>
           <span>072-2838281</span>
           <p className="text-xs">{new Date().toLocaleString()}</p>
+          <p>ID: {generateInvoiceId()}</p>
         </div>
         <table className="w-full text-sm mb-4">
           <thead>
@@ -267,10 +320,14 @@ export default function Billing() {
         </div>
         <footer>
           <div className="text-center border-t border-black pt-4 mt-4">
-            <h1 className="text-xl font-bold uppercase">Thank You Visit Again!</h1>
+            <h1 className="text-xl font-bold uppercase">
+              Thank You Visit Again!
+            </h1>
             <p className="text-xs">Powered by Trovix Tech</p>
             <p className="text-xs">0756519837/0764726820</p>
-            <p className="text-xs">Copyright &copy; {new Date().getFullYear()}</p>
+            <p className="text-xs">
+              Copyright &copy; {new Date().getFullYear()}
+            </p>
           </div>
         </footer>
       </div>
