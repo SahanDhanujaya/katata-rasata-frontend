@@ -11,6 +11,9 @@ export default function Login() {
     if (email === "admin@gmail.com" && password === "1234") {
       localStorage.setItem("isAuth", "true");
       navigate("/");
+    } else if (email === "superadmin@gmail.com" && password === "5678") {
+      localStorage.setItem("isSuperAuth", "true");
+      navigate("/superadmin");
     } else {
       alert("Invalid credentials");
     }

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 
 const API = "https://katata-rasata-backend.onrender.com/api";
+// const API = "http://localhost:5000/api";
 
 interface Item {
   _id: string;
@@ -31,7 +32,15 @@ export default function Billing() {
   };
 
   useEffect(() => {
-    axios.get(`${API}/items`).then((res) => setItems(res.data));
+    const getItems = async () => {
+      try {
+        const res = await axios.get(`${API}/items`);
+        setItems(res.data);
+      } catch (err) {
+        console.error("Error fetching items:", err);
+      }
+    };
+    getItems();
   }, []);
 
   const categories = [
@@ -71,7 +80,9 @@ export default function Billing() {
   const checkout = async () => {
     if (!cart.length) return;
     setLoading(true);
-    await axios.post(`${API}/sales`, { items: cart, totalAmount: total });
+    const res = await axios.post(`${API}/sales`, { items: cart, totalAmount: total });
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    res ? printBill() : alert("Error saving the order");
     setSaved(true);
     setCart([]);
     setLoading(false);
@@ -79,7 +90,9 @@ export default function Billing() {
     setTimeout(() => setSaved(false), 3000);
   };
 
-  const printBill = () => window.print();
+  const printBill = () => {
+    window.print();
+  };
 
   return (
     <div className="flex flex-col lg:flex-row h-[calc(100vh-56px)] bg-zinc-950 text-zinc-100 overflow-hidden relative">
@@ -247,19 +260,19 @@ export default function Billing() {
           )}
 
           <div className="grid grid-cols-1 gap-2">
-            <button
+            {/* <button
               onClick={checkout}
               disabled={!cart.length || loading}
               className="w-full rounded-lg bg-amber-400 py-4 font-mono text-sm font-bold text-zinc-900 hover:bg-amber-300 disabled:opacity-40 uppercase"
             >
               {loading ? "Saving..." : "Confirm & Save"}
-            </button>
+            </button> */}
             <button
-              onClick={printBill}
+              onClick={checkout}
               disabled={!cart.length}
               className="w-full rounded-lg border border-white/10 py-3 font-mono text-[10px] tracking-widest text-zinc-400 uppercase"
             >
-              Print Receipt
+              {loading ? "Saving..." : "Save & Print Receipt"}
             </button>
           </div>
         </div>

@@ -5,6 +5,9 @@ import ViewBills from "./pages/ViewBills";
 import Login from "./pages/Login";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
+import SuperAdminPage from "./pages/admin/SuperAdminPage";
+import PrivateRouter from "./components/PrivateRouter";
+import ComisPage from "./pages/admin/ComisPage";
 
 function App() {
   return (
@@ -23,8 +26,21 @@ function App() {
                 <Route path="/" element={<Billing />} />
                 <Route path="/add" element={<AddItem />} />
                 <Route path="/report" element={<ViewBills />} />
+                
               </Routes>
             </ProtectedRoute>
+          }
+        />
+        {/* Super Admin */}
+        <Route
+          path="/superadmin/*"
+          element={
+            <PrivateRouter>
+              <Routes>
+                <Route path="/" element={<SuperAdminPage />} />
+                <Route path="/comis" element={<ComisPage />} />
+              </Routes>
+            </PrivateRouter>
           }
         />
       </Routes>
