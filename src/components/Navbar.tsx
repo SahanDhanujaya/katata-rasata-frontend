@@ -15,6 +15,7 @@ export default function Navbar() {
 
   const logout = () => {
     localStorage.removeItem("isAuth");
+    localStorage.removeItem("isSuperAuth");
     navigate("/login");
   };
 
