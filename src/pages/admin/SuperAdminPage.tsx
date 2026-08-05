@@ -38,27 +38,37 @@ export default function SuperAdminPage() {
   const [editingBill, setEditingBill] = useState<Bill | null>(null);
   const [savingEdit, setSavingEdit] = useState(false);
 
-  const fetchData = useCallback(async (targetPage: number) => {
-    setLoading(true);
-    try {
-      const res = await axios.get(`${API}/sales/report`, {
-        params: {
-          startDate: dateRange.start,
-          endDate: dateRange.end,
-          page: targetPage,
-          limit,
-        },
-      });
+  const fetchData = useCallback(
+    async (targetPage: number) => {
+      setLoading(true);
+      const isSuperAuth = localStorage.getItem("isSuperAuth");
+      if (!isSuperAuth) {
+        navigate("/login");
+        return;
+      }
+      try {
+        const res = await axios.get(`${API}/sales/report`, {
+          params: {
+            startDate: dateRange.start,
+            endDate: dateRange.end,
+            page: targetPage,
+            limit,
+          },
+        });
 
-      const fetchedBills = Array.isArray(res.data) ? res.data : res.data.bills;
-      setBills(fetchedBills);
-      setHasMore(fetchedBills.length === limit);
-    } catch (err) {
-      console.error("Fetch Error:", err);
-    } finally {
-      setLoading(false);
-    }
-  }, [dateRange, limit]);
+        const fetchedBills = Array.isArray(res.data)
+          ? res.data
+          : res.data.bills;
+        setBills(fetchedBills);
+        setHasMore(fetchedBills.length === limit);
+      } catch (err) {
+        console.error("Fetch Error:", err);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [dateRange, limit],
+  );
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -130,19 +140,29 @@ export default function SuperAdminPage() {
     }
   };
 
-  const pageSales = bills.reduce((sum, bill) => sum + (bill.totalAmount || 0), 0);
+  const pageSales = bills.reduce(
+    (sum, bill) => sum + (bill.totalAmount || 0),
+    0,
+  );
 
   return (
     <div className="min-h-[calc(100vh-56px)] bg-zinc-950 p-4 sm:p-6 text-zinc-100">
       <div className="mx-auto max-w-5xl space-y-6">
-
         {/* HEADER */}
         <div className="flex flex-col gap-1 border-b border-white/10 pb-6">
           <div className="flex items-center gap-2">
-            <span onDoubleClick={ () => navigate('/superadmin/comis') } className="rounded bg-red-500/10 border border-red-500/30 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest text-red-400">
+            <span
+              onDoubleClick={() => navigate("/superadmin/comis")}
+              className="rounded bg-red-500/10 border border-red-500/30 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest text-red-400"
+            >
               Super Admin
             </span>
-            <span className="font-mono text-[9px] uppercase tracking-widest text-zinc-500">
+            <span
+              onDoubleClick={() =>
+                navigate("/login") && localStorage.removeItem("isSuperAuth")
+              }
+              className="font-mono text-[9px] uppercase tracking-widest text-zinc-500"
+            >
               කටට රසට — Order Management
             </span>
           </div>
@@ -157,20 +177,28 @@ export default function SuperAdminPage() {
         {/* FILTERS */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 rounded-lg bg-zinc-900/50 p-4 border border-white/5">
           <div className="space-y-1">
-            <label className="font-mono text-[9px] uppercase tracking-widest text-zinc-500 block px-1">From</label>
+            <label className="font-mono text-[9px] uppercase tracking-widest text-zinc-500 block px-1">
+              From
+            </label>
             <input
               type="date"
               value={dateRange.start}
-              onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
+              onChange={(e) =>
+                setDateRange({ ...dateRange, start: e.target.value })
+              }
               className="w-full rounded border border-white/10 bg-zinc-800 px-3 py-2 font-mono text-xs text-zinc-100 outline-none focus:border-amber-400/40"
             />
           </div>
           <div className="space-y-1">
-            <label className="font-mono text-[9px] uppercase tracking-widest text-zinc-500 block px-1">To</label>
+            <label className="font-mono text-[9px] uppercase tracking-widest text-zinc-500 block px-1">
+              To
+            </label>
             <input
               type="date"
               value={dateRange.end}
-              onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
+              onChange={(e) =>
+                setDateRange({ ...dateRange, end: e.target.value })
+              }
               className="w-full rounded border border-white/10 bg-zinc-800 px-3 py-2 font-mono text-xs text-zinc-100 outline-none focus:border-amber-400/40"
             />
           </div>
@@ -185,12 +213,20 @@ export default function SuperAdminPage() {
         {/* SUMMARY */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="rounded-lg border border-amber-400/20 bg-amber-400/5 px-6 py-4">
-            <p className="font-mono text-[10px] tracking-widest text-zinc-500 uppercase">Visible Page Total</p>
-            <p className="font-mono text-xl font-bold text-amber-400">Rs. {pageSales.toLocaleString()}</p>
+            <p className="font-mono text-[10px] tracking-widest text-zinc-500 uppercase">
+              Visible Page Total
+            </p>
+            <p className="font-mono text-xl font-bold text-amber-400">
+              Rs. {pageSales.toLocaleString()}
+            </p>
           </div>
           <div className="rounded-lg border border-white/10 bg-zinc-900/50 px-6 py-4">
-            <p className="font-mono text-[10px] tracking-widest text-zinc-500 uppercase">Records in Batch</p>
-            <p className="font-mono text-xl font-bold text-zinc-300">{bills.length} Bills</p>
+            <p className="font-mono text-[10px] tracking-widest text-zinc-500 uppercase">
+              Records in Batch
+            </p>
+            <p className="font-mono text-xl font-bold text-zinc-300">
+              {bills.length} Bills
+            </p>
           </div>
         </div>
 
@@ -198,7 +234,9 @@ export default function SuperAdminPage() {
         {loading ? (
           <div className="flex h-64 flex-col items-center justify-center gap-2">
             <div className="h-6 w-6 animate-spin rounded-full border-2 border-amber-400 border-t-transparent"></div>
-            <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">Retrieving Archive...</p>
+            <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">
+              Retrieving Archive...
+            </p>
           </div>
         ) : bills.length === 0 ? (
           <div className="flex h-64 items-center justify-center rounded-lg border border-dashed border-white/10 font-mono text-xs uppercase tracking-widest text-zinc-600">
@@ -208,24 +246,41 @@ export default function SuperAdminPage() {
           <>
             <div className="grid gap-4">
               {bills.map((bill) => (
-                <div key={bill._id} className="group rounded-lg border border-white/10 bg-zinc-900 transition-colors hover:border-white/20">
+                <div
+                  key={bill._id}
+                  className="group rounded-lg border border-white/10 bg-zinc-900 transition-colors hover:border-white/20"
+                >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 border-b border-white/5">
                     <div className="flex flex-wrap gap-4">
                       <div className="flex flex-col">
-                        <span className="font-mono text-[9px] text-zinc-500 uppercase">Date/Time</span>
+                        <span className="font-mono text-[9px] text-zinc-500 uppercase">
+                          Date/Time
+                        </span>
                         <span className="font-mono text-xs text-zinc-200">
-                          {new Date(bill.date).toLocaleDateString()} — {new Date(bill.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          {new Date(bill.date).toLocaleDateString()} —{" "}
+                          {new Date(bill.date).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
                         </span>
                       </div>
                       <div className="flex flex-col">
-                        <span className="font-mono text-[9px] text-zinc-500 uppercase">Receipt #</span>
-                        <span className="font-mono text-xs text-zinc-500">#{bill._id?.slice(-6).toUpperCase()}</span>
+                        <span className="font-mono text-[9px] text-zinc-500 uppercase">
+                          Receipt #
+                        </span>
+                        <span className="font-mono text-xs text-zinc-500">
+                          #{bill._id?.slice(-6).toUpperCase()}
+                        </span>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="text-right">
-                        <span className="font-mono text-[9px] text-zinc-500 uppercase">Grand Total</span>
-                        <p className="font-mono text-md font-bold text-amber-400">Rs. {bill.totalAmount.toLocaleString()}</p>
+                        <span className="font-mono text-[9px] text-zinc-500 uppercase">
+                          Grand Total
+                        </span>
+                        <p className="font-mono text-md font-bold text-amber-400">
+                          Rs. {bill.totalAmount.toLocaleString()}
+                        </p>
                       </div>
                       <button
                         onClick={() => openEdit(bill)}
@@ -245,9 +300,19 @@ export default function SuperAdminPage() {
                   <div className="px-4 py-3 bg-zinc-800/10">
                     <div className="space-y-1.5">
                       {bill.items.map((item, idx) => (
-                        <div key={idx} className="flex justify-between font-mono text-[11px]">
-                          <span className="text-zinc-400">{item.name} <span className="text-zinc-600 ml-1">×{item.qty}</span></span>
-                          <span className="text-zinc-300">Rs. {(item.price * item.qty).toLocaleString()}</span>
+                        <div
+                          key={idx}
+                          className="flex justify-between font-mono text-[11px]"
+                        >
+                          <span className="text-zinc-400">
+                            {item.name}{" "}
+                            <span className="text-zinc-600 ml-1">
+                              ×{item.qty}
+                            </span>
+                          </span>
+                          <span className="text-zinc-300">
+                            Rs. {(item.price * item.qty).toLocaleString()}
+                          </span>
                         </div>
                       ))}
                     </div>
@@ -288,9 +353,12 @@ export default function SuperAdminPage() {
       {confirmDeleteId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
           <div className="w-full max-w-sm rounded-lg border border-white/10 bg-zinc-900 p-6 space-y-4">
-            <h3 className="font-mono text-sm font-bold uppercase tracking-widest text-red-400">Delete Order?</h3>
+            <h3 className="font-mono text-sm font-bold uppercase tracking-widest text-red-400">
+              Delete Order?
+            </h3>
             <p className="font-mono text-xs text-zinc-400">
-              This will permanently remove receipt #{confirmDeleteId.slice(-6).toUpperCase()}. This cannot be undone.
+              This will permanently remove receipt #
+              {confirmDeleteId.slice(-6).toUpperCase()}. This cannot be undone.
             </p>
             <div className="flex gap-3">
               <button
@@ -328,8 +396,13 @@ export default function SuperAdminPage() {
 
             <div className="space-y-2">
               {editingBill.items.map((item, idx) => (
-                <div key={idx} className="flex items-center justify-between rounded border border-white/10 bg-zinc-800/40 px-3 py-2">
-                  <span className="font-mono text-xs text-zinc-200 flex-1 truncate">{item.name}</span>
+                <div
+                  key={idx}
+                  className="flex items-center justify-between rounded border border-white/10 bg-zinc-800/40 px-3 py-2"
+                >
+                  <span className="font-mono text-xs text-zinc-200 flex-1 truncate">
+                    {item.name}
+                  </span>
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => updateEditItemQty(idx, -1)}
@@ -337,7 +410,9 @@ export default function SuperAdminPage() {
                     >
                       −
                     </button>
-                    <span className="font-mono text-xs text-zinc-200 w-4 text-center">{item.qty}</span>
+                    <span className="font-mono text-xs text-zinc-200 w-4 text-center">
+                      {item.qty}
+                    </span>
                     <button
                       onClick={() => updateEditItemQty(idx, 1)}
                       className="flex h-6 w-6 items-center justify-center rounded-full border border-white/10 text-zinc-400"
@@ -356,7 +431,9 @@ export default function SuperAdminPage() {
             </div>
 
             <div className="flex items-center justify-between border-t border-white/10 pt-4">
-              <span className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">New Total</span>
+              <span className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">
+                New Total
+              </span>
               <span className="font-mono text-lg font-bold text-amber-400">
                 Rs. {editingBill.totalAmount.toLocaleString()}
               </span>
