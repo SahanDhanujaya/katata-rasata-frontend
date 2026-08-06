@@ -121,7 +121,7 @@ export default function ComisPage() {
                 <button className="hover:text-zinc-100 border border-white/10 p-1" onClick={() => window.history.back()}> ⬅ Go to Back</button>
             </nav>
           <span className="font-mono text-[9px] uppercase tracking-widest text-zinc-500">
-            කටට රසට — Deleted Order Ledger
+            Laka's Take away — Deleted Order Ledger
           </span>
           <h2 className="font-mono text-xl sm:text-2xl font-bold tracking-tighter text-amber-400 uppercase">
             Comis
