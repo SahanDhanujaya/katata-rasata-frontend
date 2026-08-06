@@ -1,9 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
-const API = "https://katata-rasata-backend.onrender.com/api";
-// const API = "http://localhost:5000/api";
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 interface BackupRecord {
   _id: string;
@@ -30,18 +28,12 @@ export default function ComisPage() {
   const [loading, setLoading] = useState(true);
   const [selectedMonth, setSelectedMonth] = useState<string>("ALL");
   const [page, setPage] = useState(1);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchBackups = async () => {
       setLoading(true);
-      const isSuperAuth = localStorage.getItem("isSuperAuth");
-      if (!isSuperAuth) {
-        navigate("/login");
-        return;
-      }
       try {
-        const res = await axios.get(`${API}/sales/backups`);
+        const res = await axios.get(`${BASE_URL}/sales/backups`);
         setBackups(res.data);
       } catch (err) {
         console.error("Error fetching backups:", err);

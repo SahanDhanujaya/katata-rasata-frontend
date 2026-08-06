@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-const API = "https://katata-rasata-backend.onrender.com/api";
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 // const API = "http://localhost:5000/api";
 const CATEGORIES = ["BEVERAGE", "FOOD", "DESSERT", "SNACK", "OTHER"];
 const ITEMS_PER_PAGE = 8; // Adjust this number as needed
@@ -35,7 +35,7 @@ export default function AddItem() {
 
   const fetchItems = async () => {
     try {
-      const res = await axios.get(`${API}/items`);
+      const res = await axios.get(`${BASE_URL}/items`);
       setItems(res.data);
     } catch (err) { console.error("Error fetching items:", err); }
   };
@@ -68,8 +68,8 @@ export default function AddItem() {
     setLoading(true);
     try {
       const payload = { ...form, price: Number(form.price) };
-      if (editingId) await axios.put(`${API}/items/${editingId}`, payload);
-      else await axios.post(`${API}/items`, payload);
+      if (editingId) await axios.put(`${BASE_URL}/items/${editingId}`, payload);
+      else await axios.post(`${BASE_URL}/items`, payload);
       setSaved(true);
       setForm({ name: "", price: "", category: "" });
       setEditingId(null);
@@ -82,7 +82,7 @@ export default function AddItem() {
   const deleteItem = async (id: string) => {
     if (!confirm("Are you sure?")) return;
     try {
-      await axios.delete(`${API}/items/${id}`);
+      await axios.delete(`${BASE_URL}/items/${id}`);
       setItems(items.filter((item) => item._id !== id));
       if (editingId === id) cancelEdit();
     } catch (err) { console.error("Error deleting:", err); }

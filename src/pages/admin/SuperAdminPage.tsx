@@ -2,8 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const API = "https://katata-rasata-backend.onrender.com/api";
-// const API = "http://localhost:5000/api";
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 interface BillItem {
   name: string;
@@ -41,13 +40,8 @@ export default function SuperAdminPage() {
   const fetchData = useCallback(
     async (targetPage: number) => {
       setLoading(true);
-      const isSuperAuth = localStorage.getItem("isSuperAuth");
-      if (!isSuperAuth) {
-        navigate("/login");
-        return;
-      }
       try {
-        const res = await axios.get(`${API}/sales/report`, {
+        const res = await axios.get(`${BASE_URL}/sales/report`, {
           params: {
             startDate: dateRange.start,
             endDate: dateRange.end,
@@ -87,7 +81,7 @@ export default function SuperAdminPage() {
   const handleDelete = async (id: string) => {
     setDeletingId(id);
     try {
-      await axios.delete(`${API}/sales/${id}`);
+      await axios.delete(`${BASE_URL}/sales/${id}`);
       setBills((prev) => prev.filter((b) => b._id !== id));
     } catch (err) {
       console.error("Delete Error:", err);
@@ -124,7 +118,7 @@ export default function SuperAdminPage() {
     if (!editingBill) return;
     setSavingEdit(true);
     try {
-      await axios.put(`${API}/sales/${editingBill._id}`, {
+      await axios.put(`${BASE_URL}/sales/${editingBill._id}`, {
         items: editingBill.items,
         totalAmount: editingBill.totalAmount,
       });
@@ -145,6 +139,16 @@ export default function SuperAdminPage() {
     0,
   );
 
+  async function logout() {
+    await axios.post(
+      `${BASE_URL}/auth/logout`,
+      {},
+      {
+        withCredentials: true,
+      },
+    );
+  }
+
   return (
     <div className="min-h-[calc(100vh-56px)] bg-zinc-950 p-4 sm:p-6 text-zinc-100">
       <div className="mx-auto max-w-5xl space-y-6">
@@ -159,7 +163,7 @@ export default function SuperAdminPage() {
             </span>
             <span
               onDoubleClick={() =>
-                navigate("/login") && localStorage.removeItem("isSuperAuth")
+                logout().then(() => navigate("/login", { replace: true }))
               }
               className="font-mono text-[9px] uppercase tracking-widest text-zinc-500"
             >

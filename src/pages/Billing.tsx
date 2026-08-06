@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-const API = "https://katata-rasata-backend.onrender.com/api";
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+// const API = "https://katata-rasata-backend.onrender.com/api";
 // const API = "http://localhost:5000/api";
 
 interface Item {
@@ -34,7 +35,7 @@ export default function Billing() {
   useEffect(() => {
     const getItems = async () => {
       try {
-        const res = await axios.get(`${API}/items`);
+        const res = await axios.get(`${BASE_URL}/items`);
         setItems(res.data);
       } catch (err) {
         console.error("Error fetching items:", err);
@@ -80,7 +81,7 @@ export default function Billing() {
   const checkout = async () => {
     if (!cart.length) return;
     setLoading(true);
-    const res = await axios.post(`${API}/sales`, { items: cart, totalAmount: total });
+    const res = await axios.post(`${BASE_URL}/sales`, { items: cart, totalAmount: total });
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     res ? printBill() : alert("Error saving the order");
     setSaved(true);

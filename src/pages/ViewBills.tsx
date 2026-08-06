@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 
-const API = "https://katata-rasata-backend.onrender.com/api";
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 export default function ViewBills() {
   const [bills, setBills] = useState<any[]>([]);
@@ -21,7 +21,7 @@ export default function ViewBills() {
   const fetchData = useCallback(async (targetPage: number) => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API}/sales/report`, {
+      const res = await axios.get(`${BASE_URL}/sales/report`, {
         params: {
           startDate: dateRange.start,
           endDate: dateRange.end,
