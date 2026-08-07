@@ -10,8 +10,8 @@ import axios from "axios";
 type AuthContextType = {
   isAuth: boolean;
   isLoading: boolean;
-  user: any;
-  checkAuth: () => Promise<void>;
+  user: { role?: string; [key: string]: unknown } | null;
+  checkAuth: () => Promise<{ role?: string; [key: string]: unknown } | null>;
   logout: () => void;
 };
 
@@ -20,20 +20,26 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuth, setIsAuth] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<AuthContextType["user"]>(null);
   const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
   const checkAuth = async () => {
     try {
       const res = await axios.get(`${BASE_URL}/auth/me`, {
-        withCredentials: true, // Sends the cookie
+        withCredentials: true,
       });
       if (res.data.success) {
         setIsAuth(true);
         setUser(res.data.user);
+        return res.data.user; // <-- return it directly
       }
+      setIsAuth(false);
+      setUser(null);
+      return null;
     } catch {
       setIsAuth(false);
+      setUser(null);
+      return null;
     } finally {
       setIsLoading(false);
     }

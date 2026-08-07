@@ -13,8 +13,6 @@ export default function Navbar() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
-  const { checkAuth } = useAuth();
-
   const [open, setOpen] = useState(false);
 
   const BASE_URL =
@@ -33,8 +31,6 @@ export default function Navbar() {
         alert(data.message);
         return;
       }
-
-      await checkAuth();
 
       navigate("/login", {
         replace: true,

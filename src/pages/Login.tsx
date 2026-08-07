@@ -9,10 +9,9 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
-  const { checkAuth, user } = useAuth();
+  const { checkAuth } = useAuth();
 
-  const BASE_URL =
-    import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+  const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
   const login = async () => {
     try {
@@ -38,17 +37,18 @@ export default function Login() {
       }
 
       if (data.success) {
-        await checkAuth();
-        if (user.role == "admin") {
+        const freshUser = await checkAuth(); // use the returned value, not the closed-over `user`
+
+        if (freshUser?.role === "admin") {
           navigate("/superadmin", { replace: true });
-          toast("✅ Login successful!");
-          return;
+        } else {
+          navigate("/", { replace: true });
         }
-        navigate("/", { replace: true });
         toast("✅ Login successful!");
       } else {
         toast(data.message || "❌ Login failed");
       }
+
     } catch (error) {
       console.error(error);
       toast("ℹ Something went wrong.");
