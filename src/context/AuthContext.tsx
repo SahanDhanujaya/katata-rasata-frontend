@@ -6,7 +6,6 @@ import {
   type ReactNode,
 } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
 type AuthContextType = {
   isAuth: boolean;
@@ -23,7 +22,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
   const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
-  const navigate = useNavigate();
 
   const checkAuth = async () => {
     try {
@@ -32,13 +30,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
       if (res.data.success) {
         setIsAuth(true);
-        if (res.data.user.role === "admin") {
-          navigate("/superadmin", { replace: true });
-        } else if (res.data.user.role === "user") {
-          navigate("/", { replace: true });
-        } else {
-          navigate("/login", { replace: true });
-        }
         setUser(res.data.user);
       }
     } catch {
