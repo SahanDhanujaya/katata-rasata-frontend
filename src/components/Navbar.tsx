@@ -1,7 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import ThemeToggle from "./ThemeToggle";
-import { useAuth } from "../context/AuthContext"; // Update path if needed
 
 const navLinks = [
   { to: "/", label: "Billing" },
