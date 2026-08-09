@@ -77,22 +77,82 @@ export default function Billing() {
 
   const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
   const itemCount = cart.reduce((sum, i) => sum + i.qty, 0);
-
+  const [printSnapshot, setPrintSnapshot] = useState<{
+    invoiceId: string;
+    cart: CartItem[];
+    total: number;
+  } | null>(null);
   const checkout = async () => {
     if (!cart.length) return;
     setLoading(true);
-    const res = await axios.post(`${BASE_URL}/sales`, { items: cart, totalAmount: total });
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    res ? printBill() : alert("Error saving the order");
-    setSaved(true);
-    setCart([]);
-    setLoading(false);
-    setShowMobileCart(false);
-    setTimeout(() => setSaved(false), 3000);
+
+    // Generate ONE invoice ID and snapshot the cart/total before anything changes
+    const invoiceId = generateInvoiceId();
+    const orderSnapshot = [...cart];
+    const totalSnapshot = total;
+
+    try {
+      const res = await axios.post(`${BASE_URL}/sales`, {
+        orderId: invoiceId, // now linked to the printed receipt
+        items: orderSnapshot,
+        totalAmount: totalSnapshot,
+      });
+
+      if (res) {
+        await printBill(invoiceId, orderSnapshot, totalSnapshot); // awaited + snapshot passed in
+        setSaved(true);
+        setCart([]);
+        setTimeout(() => setSaved(false), 3000);
+      } else {
+        alert("Error saving the order");
+      }
+    } catch (err) {
+      console.error("Checkout failed:", err);
+      alert("Error saving the order. Please try again.");
+    } finally {
+      setLoading(false);
+      setShowMobileCart(false);
+    }
   };
 
-  const printBill = () => {
-    window.print();
+  const printBill = async (
+    invoiceId: string,
+    cartSnapshot: CartItem[],
+    totalSnapshot: number,
+  ) => {
+    if (!cartSnapshot.length) {
+      alert("Cart is empty");
+      return;
+    }
+
+    const payload = {
+      orderId: invoiceId,
+      items: cartSnapshot.map((c) => ({
+        name: c.name,
+        qty: c.qty,
+        price: c.price,
+      })),
+      total: totalSnapshot,
+    };
+
+    try {
+      const res = await fetch(`${BASE_URL}/print-bluetooth`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Print failed");
+
+      console.log("Printed successfully:", data.message);
+    } catch (error) {
+      console.error(
+        "Bluetooth print failed, falling back to browser print:",
+        error,
+      );
+      setPrintSnapshot({ invoiceId, cart: cartSnapshot, total: totalSnapshot });
+    }
   };
 
   return (
@@ -302,24 +362,18 @@ export default function Billing() {
       )}
 
       {/* ── PRINT STYLES & AREA (REMAINS SAME) ── */}
+      {/* PRINT AREA — now uses printSnapshot, not live cart state */}
       <div className="hidden print:block print-area w-full p-8 bg-white text-black font-mono">
         <div className="text-center border-b border-black pb-4 mb-4 border-dotted">
           <h1 className="text-xl font-bold uppercase">Laka's Take Away</h1>
           <p className="text-xs">Horana road Wadaka panadura</p>
           <span>0763243716</span>
           <p className="text-xs">{new Date().toLocaleString()}</p>
-          <p>ID: {generateInvoiceId()}</p>
+          <p>ID: {printSnapshot?.invoiceId}</p>
         </div>
         <table className="w-full text-sm mb-4">
-          <thead>
-            <tr className="border-b border-black text-left">
-              <th className="py-1">Item</th>
-              <th className="py-1 text-center">Qty</th>
-              <th className="py-1 text-right">Price</th>
-            </tr>
-          </thead>
           <tbody>
-            {cart.map((c) => (
+            {printSnapshot?.cart.map((c) => (
               <tr key={c._id} className="border-b border-gray-200">
                 <td className="py-2">{c.name}</td>
                 <td className="py-2 text-center">{c.qty}</td>
@@ -330,20 +384,10 @@ export default function Billing() {
         </table>
         <div className="flex justify-between items-center pt-2 border-t border-black">
           <span className="font-bold">TOTAL</span>
-          <span className="text-xl font-bold">Rs.{total.toLocaleString()}</span>
+          <span className="text-xl font-bold">
+            Rs.{printSnapshot?.total.toLocaleString()}
+          </span>
         </div>
-        <footer>
-          <div className="text-center border-t border-black pt-4 mt-4">
-            <h1 className="text-xl font-bold uppercase">
-              Thank You Visit Again!
-            </h1>
-            <p className="text-xs">Powered by Trovix Tech</p>
-            <p className="text-xs">0756519837/0764726820</p>
-            <p className="text-xs">
-              Copyright &copy; {new Date().getFullYear()}
-            </p>
-          </div>
-        </footer>
       </div>
 
       <style>{`
