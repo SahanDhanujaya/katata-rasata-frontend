@@ -12,6 +12,7 @@ interface BillItem {
 
 interface Bill {
   _id: string;
+  orderId: string;
   date: string;
   totalAmount: number;
   items: BillItem[];
@@ -273,7 +274,7 @@ export default function SuperAdminPage() {
                           Receipt #
                         </span>
                         <span className="font-mono text-xs text-zinc-500">
-                          #{bill._id?.slice(-6).toUpperCase()}
+                          #{bill.orderId.toUpperCase()}
                         </span>
                       </div>
                     </div>

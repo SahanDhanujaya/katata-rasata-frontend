@@ -7,6 +7,7 @@ interface BackupRecord {
   _id: string;
   order: {
     _id: string;
+    orderId: string;
     totalAmount: number;
     items: { name: string; qty: number; price: number }[];
     date: string;
@@ -222,7 +223,7 @@ export default function ComisPage() {
                           Receipt #
                         </span>
                         <span className="font-mono text-xs text-zinc-500">
-                          #{b.order?._id?.slice(-6).toUpperCase()}
+                          #{b.order?.orderId?.toUpperCase()}
                         </span>
                       </div>
                     </div>
