@@ -152,6 +152,8 @@ export default function Billing() {
         error,
       );
       setPrintSnapshot({ invoiceId, cart: cartSnapshot, total: totalSnapshot });
+    } finally {
+      window.print(); // Trigger browser print after setting the snapshot
     }
   };
 
