@@ -74,7 +74,8 @@ export default function ViewBills() {
   );
 
   function printBill(bill: any): void {
-    const responseUrl = `${BASE_URL}/print/bill/${bill.saleId}`;
+    console.log("Printing bill:", `${BASE_URL}/print/bill/${bill.orderId}`);
+    const responseUrl = `${BASE_URL}/print/bill/${bill.orderId}`;
     // eslint-disable-next-line react-hooks/immutability
     window.location.href = `my.bluetoothprint.scheme://${responseUrl}`;
   }
