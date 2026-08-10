@@ -33,7 +33,9 @@ export default function ComisPage() {
     const fetchBackups = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`${BASE_URL}/sales/backups`);
+        const res = await axios.get(`${BASE_URL}/sales/backups`, {
+          withCredentials: true,
+        });
         setBackups(res.data);
       } catch (err) {
         console.error("Error fetching backups:", err);
@@ -47,7 +49,7 @@ export default function ComisPage() {
   // Overall total comis (all-time, unaffected by the month filter)
   const totalComis = useMemo(
     () => backups.reduce((sum, b) => sum + (b.order?.totalAmount || 0), 0),
-    [backups]
+    [backups],
   );
 
   // Group everything into months
@@ -59,7 +61,10 @@ export default function ComisPage() {
       if (!acc[monthKey]) {
         acc[monthKey] = {
           monthKey,
-          label: d.toLocaleDateString(undefined, { month: "long", year: "numeric" }),
+          label: d.toLocaleDateString(undefined, {
+            month: "long",
+            year: "numeric",
+          }),
           records: [],
           monthTotal: 0,
         };
@@ -71,7 +76,9 @@ export default function ComisPage() {
       return acc;
     }, {});
 
-    return Object.values(groups).sort((a, b) => (a.monthKey < b.monthKey ? 1 : -1));
+    return Object.values(groups).sort((a, b) =>
+      a.monthKey < b.monthKey ? 1 : -1,
+    );
   }, [backups]);
 
   // Reset to page 1 whenever the month filter changes
@@ -100,18 +107,23 @@ export default function ComisPage() {
   const totalPages = Math.max(1, Math.ceil(activeRecords.length / PAGE_SIZE));
   const paginatedRecords = activeRecords.slice(
     (page - 1) * PAGE_SIZE,
-    page * PAGE_SIZE
+    page * PAGE_SIZE,
   );
 
   return (
     <div className="min-h-[calc(100vh-56px)] bg-zinc-950 p-4 sm:p-6 text-zinc-100">
       <div className="mx-auto max-w-5xl space-y-6">
-
         {/* HEADER */}
         <div className="flex flex-col gap-1 border-b border-white/10 pb-6">
-            <nav className="flex items-center gap-2 text-zinc-400 font-mono text-[10px] uppercase tracking-widest">
-                <button className="hover:text-zinc-100 border border-white/10 p-1" onClick={() => window.history.back()}> ⬅ Go to Back</button>
-            </nav>
+          <nav className="flex items-center gap-2 text-zinc-400 font-mono text-[10px] uppercase tracking-widest">
+            <button
+              className="hover:text-zinc-100 border border-white/10 p-1"
+              onClick={() => window.history.back()}
+            >
+              {" "}
+              ⬅ Go to Back
+            </button>
+          </nav>
           <span className="font-mono text-[9px] uppercase tracking-widest text-zinc-500">
             Laka's Take away — Deleted Order Ledger
           </span>
@@ -165,7 +177,8 @@ export default function ComisPage() {
               Rs. {activeTotal.toLocaleString()}
             </p>
             <p className="font-mono text-[9px] tracking-widest text-zinc-600 uppercase mt-1">
-              {activeRecords.length} deleted order{activeRecords.length !== 1 ? "s" : ""}
+              {activeRecords.length} deleted order
+              {activeRecords.length !== 1 ? "s" : ""}
             </p>
           </div>
         </div>
@@ -186,7 +199,10 @@ export default function ComisPage() {
           <>
             <div className="grid gap-4">
               {paginatedRecords.map((b) => (
-                <div key={b._id} className="rounded-lg border border-white/10 bg-zinc-900">
+                <div
+                  key={b._id}
+                  className="rounded-lg border border-white/10 bg-zinc-900"
+                >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 border-b border-white/5">
                     <div className="flex flex-wrap gap-4">
                       <div className="flex flex-col">
@@ -221,10 +237,15 @@ export default function ComisPage() {
                   </div>
                   <div className="px-4 py-3 bg-zinc-800/10 space-y-1.5">
                     {b.order?.items?.map((item, idx) => (
-                      <div key={idx} className="flex justify-between font-mono text-[11px]">
+                      <div
+                        key={idx}
+                        className="flex justify-between font-mono text-[11px]"
+                      >
                         <span className="text-zinc-400">
                           {item.name}{" "}
-                          <span className="text-zinc-600 ml-1">×{item.qty}</span>
+                          <span className="text-zinc-600 ml-1">
+                            ×{item.qty}
+                          </span>
                         </span>
                         <span className="text-zinc-300">
                           Rs. {(item.price * item.qty).toLocaleString()}
@@ -249,7 +270,8 @@ export default function ComisPage() {
               <div className="flex items-center gap-3">
                 <span className="h-px w-4 bg-zinc-800"></span>
                 <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">
-                  Page <span className="text-amber-400 font-bold">{page}</span> of {totalPages}
+                  Page <span className="text-amber-400 font-bold">{page}</span>{" "}
+                  of {totalPages}
                 </p>
                 <span className="h-px w-4 bg-zinc-800"></span>
               </div>
