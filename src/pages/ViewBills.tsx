@@ -74,11 +74,33 @@ export default function ViewBills() {
   );
 
   function printBill(bill: any): void {
-    console.log("Printing bill:", `${BASE_URL}/print/bill/${bill.orderId}`);
-    const responseUrl = `${BASE_URL}/print/bill/${bill.orderId}`;
-    // eslint-disable-next-line react-hooks/immutability
-    window.location.href = `my.bluetoothprint.scheme://${responseUrl}`;
+  if (!bill?._id) {
+    alert("Invalid bill ID");
+    return;
   }
+
+  // Backend route:
+  // GET /api/print/bill/:saleId
+  const responseUrl = `${BASE_URL}/print/bill/${bill._id}`;
+
+  console.log("Printing bill:", responseUrl);
+
+  // Android Bluetooth Print app
+  const bluetoothPrintUrl =
+    `my.bluetoothprint.scheme://${responseUrl}`;
+
+  // Detect Android
+  const isAndroid = /Android/i.test(navigator.userAgent);
+
+  if (isAndroid) {
+    // eslint-disable-next-line react-hooks/immutability
+    window.location.href = bluetoothPrintUrl;
+    return;
+  }
+
+  // Desktop fallback
+  window.print();
+}
 
   return (
     <div className="min-h-[calc(100vh-56px)] bg-zinc-950 p-4 sm:p-6 text-zinc-100 print:bg-white print:p-0 print:text-black">
