@@ -16,6 +16,14 @@ interface CartItem extends Item {
   qty: number;
 }
 
+interface SaleResponse {
+  _id: string;
+  orderId: string;
+  items: CartItem[];
+  totalAmount: number;
+  date: string;
+}
+
 export default function Billing() {
   const [items, setItems] = useState<Item[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -25,6 +33,7 @@ export default function Billing() {
   const [loading, setLoading] = useState(false);
   // Track if mobile cart is visible
   const [showMobileCart, setShowMobileCart] = useState(false);
+
   const generateInvoiceId = () => {
     const datePart = new Date().getTime().toString().slice(-4);
     // eslint-disable-next-line react-hooks/purity
@@ -77,11 +86,28 @@ export default function Billing() {
 
   const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
   const itemCount = cart.reduce((sum, i) => sum + i.qty, 0);
+
   const [printSnapshot, setPrintSnapshot] = useState<{
     invoiceId: string;
     cart: CartItem[];
     total: number;
   } | null>(null);
+
+  // Sends the tablet's browser to the Bluetooth Print app, which fetches
+  // /api/print/bill/:saleId from our own backend and prints the result.
+  const printBillViaBluetooth = (saleId: string) => {
+    const responseUrl = `${BASE_URL}/print/bill/${saleId}`;
+    // eslint-disable-next-line react-hooks/immutability
+    window.location.href = `my.bluetoothprint.scheme://${responseUrl}`;
+  };
+
+  // Manual fallback in case the Bluetooth Print app isn't available/working —
+  // uses the hidden .print-area block further down via the browser's own print dialog.
+  const printBillViaBrowser = () => {
+    if (!printSnapshot) return;
+    window.print();
+  };
+
   const checkout = async () => {
     if (!cart.length) return;
     setLoading(true);
@@ -92,19 +118,26 @@ export default function Billing() {
     const totalSnapshot = total;
 
     try {
-      const res = await axios.post(`${BASE_URL}/sales`, {
-        orderId: invoiceId, // now linked to the printed receipt
+      const res = await axios.post<SaleResponse>(`${BASE_URL}/sales`, {
+        orderId: invoiceId,
         items: orderSnapshot,
         totalAmount: totalSnapshot,
       });
 
-      if (res) {
-        await printBill(invoiceId, orderSnapshot, totalSnapshot); // awaited + snapshot passed in
+      const savedSaleId = res.data?._id;
+
+      if (savedSaleId) {
+        setPrintSnapshot({
+          invoiceId,
+          cart: orderSnapshot,
+          total: totalSnapshot,
+        });
+        printBillViaBluetooth(savedSaleId);
         setSaved(true);
         setCart([]);
         setTimeout(() => setSaved(false), 3000);
       } else {
-        alert("Error saving the order");
+        alert("Order saved, but no ID was returned — check the receipt manually.");
       }
     } catch (err) {
       console.error("Checkout failed:", err);
@@ -112,48 +145,6 @@ export default function Billing() {
     } finally {
       setLoading(false);
       setShowMobileCart(false);
-    }
-  };
-
-  const printBill = async (
-    invoiceId: string,
-    cartSnapshot: CartItem[],
-    totalSnapshot: number,
-  ) => {
-    if (!cartSnapshot.length) {
-      alert("Cart is empty");
-      return;
-    }
-
-    const payload = {
-      orderId: invoiceId,
-      items: cartSnapshot.map((c) => ({
-        name: c.name,
-        qty: c.qty,
-        price: c.price,
-      })),
-      total: totalSnapshot,
-    };
-
-    try {
-      const res = await fetch(`${BASE_URL}/print-bluetooth`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Print failed");
-
-      console.log("Printed successfully:", data.message);
-    } catch (error) {
-      console.error(
-        "Bluetooth print failed, falling back to browser print:",
-        error,
-      );
-      setPrintSnapshot({ invoiceId, cart: cartSnapshot, total: totalSnapshot });
-    } finally {
-      window.print(); // Trigger browser print after setting the snapshot
     }
   };
 
@@ -323,20 +314,22 @@ export default function Billing() {
           )}
 
           <div className="grid grid-cols-1 gap-2">
-            {/* <button
-              onClick={checkout}
-              disabled={!cart.length || loading}
-              className="w-full rounded-lg bg-amber-400 py-4 font-mono text-sm font-bold text-zinc-900 hover:bg-amber-300 disabled:opacity-40 uppercase"
-            >
-              {loading ? "Saving..." : "Confirm & Save"}
-            </button> */}
             <button
               onClick={checkout}
-              disabled={!cart.length}
-              className="w-full rounded-lg border border-white/10 py-3 font-mono text-[10px] tracking-widest text-zinc-400 uppercase"
+              disabled={!cart.length || loading}
+              className="w-full rounded-lg border border-white/10 py-3 font-mono text-[10px] tracking-widest text-zinc-400 uppercase disabled:opacity-40"
             >
               {loading ? "Saving..." : "Save & Print Receipt"}
             </button>
+
+            {printSnapshot && (
+              <button
+                onClick={printBillViaBrowser}
+                className="w-full rounded-lg border border-white/10 py-2 font-mono text-[10px] tracking-widest text-zinc-500 uppercase"
+              >
+                Print via Browser (fallback)
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -363,8 +356,7 @@ export default function Billing() {
         </div>
       )}
 
-      {/* ── PRINT STYLES & AREA (REMAINS SAME) ── */}
-      {/* PRINT AREA — now uses printSnapshot, not live cart state */}
+      {/* ── PRINT STYLES & AREA (browser-print fallback) ── */}
       <div className="hidden print:block print-area w-full p-8 bg-white text-black font-mono">
         <div className="text-center border-b border-black pb-4 mb-4 border-dotted">
           <h1 className="text-xl font-bold uppercase">Laka's Take Away</h1>
