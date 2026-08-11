@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import ThemeToggle from "./ThemeToggle";
+// import ThemeToggle from "./ThemeToggle";
 
 const navLinks = [
   { to: "/", label: "Billing" },
@@ -96,7 +96,7 @@ export default function Navbar() {
         {/* Right */}
 
         <div className="flex items-center gap-2">
-          <ThemeToggle />
+          {/* <ThemeToggle /> */}
 
           <button
             onClick={logout}
