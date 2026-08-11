@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import ThemeToggle from "./ThemeToggle";
+// import ThemeToggle from "./ThemeToggle";
+import { toast } from "react-toastify";
 
 const navLinks = [
   { to: "/", label: "Billing" },
@@ -14,10 +15,55 @@ export default function Navbar() {
 
   const [open, setOpen] = useState(false);
 
-  const BASE_URL =
-    import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+  const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
-  const logout = async () => {
+  const logout = () => {
+    toast(
+      ({ closeToast }) => (
+        <div>
+          <p style={{ marginBottom: 8 }}>Are you sure you want to logout?</p>
+          <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+            <button
+              onClick={closeToast}
+              style={{
+                padding: "4px 12px",
+                border: "1px solid #ccc",
+                borderRadius: 4,
+                background: "transparent",
+                cursor: "pointer",
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => {
+                closeToast();
+                performLogout(); // your actual logout logic goes here
+              }}
+              style={{
+                padding: "4px 12px",
+                border: "none",
+                borderRadius: 4,
+                background: "#dc2626",
+                color: "#fff",
+                cursor: "pointer",
+              }}
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      ),
+      {
+        autoClose: false,
+        closeOnClick: false,
+        closeButton: true,
+        draggable: false,
+      },
+    );
+  };
+
+  const performLogout = async () => {
     try {
       const response = await fetch(`${BASE_URL}/auth/logout`, {
         method: "POST",
@@ -34,7 +80,6 @@ export default function Navbar() {
       navigate("/login", {
         replace: true,
       });
-
     } catch (error) {
       console.error(error);
       alert("Logout failed.");
@@ -44,10 +89,8 @@ export default function Navbar() {
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-white/10 bg-zinc-950/80 backdrop-blur-md">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
-
         {/* Left */}
         <div className="flex items-center gap-3">
-
           <button
             onClick={() => setOpen(!open)}
             className="md:hidden flex h-8 w-8 items-center justify-center rounded border border-white/10 bg-zinc-900 text-zinc-400"
@@ -96,7 +139,7 @@ export default function Navbar() {
         {/* Right */}
 
         <div className="flex items-center gap-2">
-          <ThemeToggle />
+          {/* <ThemeToggle /> */}
 
           <button
             onClick={logout}
@@ -111,13 +154,10 @@ export default function Navbar() {
 
       <div
         className={`md:hidden transition-all duration-300 ${
-          open
-            ? "max-h-96 opacity-100"
-            : "max-h-0 opacity-0 overflow-hidden"
+          open ? "max-h-96 opacity-100" : "max-h-0 opacity-0 overflow-hidden"
         }`}
       >
         <div className="border-t border-white/10 bg-zinc-950 px-4 py-3 flex flex-col gap-2">
-
           {navLinks.map(({ to, label }) => {
             const active = pathname === to;
 
@@ -143,7 +183,6 @@ export default function Navbar() {
           >
             Logout
           </button>
-
         </div>
       </div>
     </nav>
