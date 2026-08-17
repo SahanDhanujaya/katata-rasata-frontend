@@ -4,7 +4,7 @@ import axios from "axios";
 
 const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 // const API = "http://localhost:5000/api";
-const CATEGORIES = ["BEVERAGE", "KOTTU", "RICE", "BITES", "CURRY", "SET MENU", "OTHER"];
+const CATEGORIES = ["BEVERAGE", "KOTTU", "RICE", "BITES", "CURRY", "SET MENU", "R&C", "NOODLES", "PASTA", "DEVIL", "OTHER"];
 const ITEMS_PER_PAGE = 8; // Adjust this number as needed
 
 interface Item {
