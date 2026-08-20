@@ -347,7 +347,7 @@ export default function Analyze() {
                       ))}
                     </Pie>
                     <Tooltip
-                      formatter={(value) => [`Rs. ${value.toLocaleString()}`, "Expense"]}
+                      formatter={(value) => [`Rs. ${value!.toLocaleString()}`, "Expense"]}
                       contentStyle={{
                         background: "#18181b",
                         border: "1px solid rgba(255,255,255,0.1)",
