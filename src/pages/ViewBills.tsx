@@ -8,7 +8,7 @@ export default function ViewBills() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [, setTotalRangeSales] = useState(0); // For total revenue across all pages
+  const [totalRangeSales, setTotalRangeSales] = useState(0); // For total revenue across all pages
   const limit = 10;
 
   const today = new Date().toISOString().split("T")[0];
@@ -68,10 +68,10 @@ export default function ViewBills() {
   };
 
   // Local calculation for the visible page
-  const pageSales = bills.reduce(
-    (sum, bill) => sum + (bill.totalAmount || 0),
-    0,
-  );
+  // const pageSales = bills.reduce(
+  //   (sum, bill) => sum + (bill.totalAmount || 0),
+  //   0,
+  // );
 
   function printBill(bill: any): void {
   if (!bill?._id) {
@@ -167,7 +167,7 @@ export default function ViewBills() {
               Visible Page Total
             </p>
             <p className="font-mono text-xl font-bold text-amber-400">
-              Rs. {pageSales.toLocaleString()}
+              Rs. {totalRangeSales.toLocaleString()}
             </p>
           </div>
           <div className="rounded-lg border border-white/10 bg-zinc-900/50 px-6 py-4">

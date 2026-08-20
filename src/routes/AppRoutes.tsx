@@ -14,6 +14,9 @@ import RoleRoute from "./RoleRoute";
 
 import MainLayout from "../layouts/MainLayout";
 import AdminLayout from "../layouts/AdminLayout";
+import Analyze from "../pages/Analyze";
+import ManageExpenses from "../pages/Expenses";
+import ManageDeposits from "../pages/ManageDeposit";
 
 export default function AppRoutes() {
   return (
@@ -30,7 +33,10 @@ export default function AppRoutes() {
 
           <Route path="/add" element={<AddItem />} />
 
-          <Route path="/report" element={<ViewBills />} />
+          <Route path="/history" element={<ViewBills />} />
+          <Route path="/analyze" element={<Analyze />} />
+          <Route path="/expenses" element={<ManageExpenses />} />
+          <Route path="/deposits" element={<ManageDeposits />} />
         </Route>
       </Route>
 
