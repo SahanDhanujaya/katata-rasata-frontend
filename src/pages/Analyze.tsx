@@ -287,7 +287,10 @@ export default function Analyze() {
                       ))}
                     </Pie>
                     <Tooltip
-                      formatter={(value: number) => [`Rs. ${value.toLocaleString()}`, "Revenue"]}
+                      formatter={(value) => {
+                        const numericValue = Number(Array.isArray(value) ? value[0] : value ?? 0);
+                        return [`Rs. ${numericValue.toLocaleString()}`, "Revenue"];
+                      }}
                       contentStyle={{
                         background: "#18181b",
                         border: "1px solid rgba(255,255,255,0.1)",
@@ -344,7 +347,7 @@ export default function Analyze() {
                       ))}
                     </Pie>
                     <Tooltip
-                      formatter={(value: number) => [`Rs. ${value.toLocaleString()}`, "Expense"]}
+                      formatter={(value) => [`Rs. ${value.toLocaleString()}`, "Expense"]}
                       contentStyle={{
                         background: "#18181b",
                         border: "1px solid rgba(255,255,255,0.1)",
