@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 
 const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
-// const API = "https://katata-rasata-backend.onrender.com/api";
-// const API = "http://localhost:5000/api";
 
 interface Item {
   _id: string;

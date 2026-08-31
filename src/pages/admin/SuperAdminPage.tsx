@@ -168,7 +168,7 @@ export default function SuperAdminPage() {
               }
               className="font-mono text-[9px] uppercase tracking-widest text-zinc-500"
             >
-              Hotel Katata Rasata — Order Management
+              Laka's Take Away — Order Management
             </span>
           </div>
           <h2 className="font-mono text-xl sm:text-2xl font-bold tracking-tighter text-amber-400 uppercase">

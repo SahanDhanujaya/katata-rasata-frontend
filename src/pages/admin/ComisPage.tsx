@@ -126,7 +126,7 @@ export default function ComisPage() {
             </button>
           </nav>
           <span className="font-mono text-[9px] uppercase tracking-widest text-zinc-500">
-            Hotel Katata Rasata — Deleted Order Ledger
+            Laka's Take Away — Deleted Order Ledger
           </span>
           <h2 className="font-mono text-xl sm:text-2xl font-bold tracking-tighter text-amber-400 uppercase">
             Comis
