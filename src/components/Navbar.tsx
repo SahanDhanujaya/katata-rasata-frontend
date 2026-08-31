@@ -131,7 +131,7 @@ export default function Navbar() {
 
           <Link
             to="/"
-            className="flex items-center gap-2 font-mono text-sm font-bold tracking-widest text-amber-400 uppercase"
+            className="flex items-center gap-2 font-mono text-md font-bold tracking-widest text-amber-400 uppercase"
           >
             <span className="hidden sm:flex h-7 w-7 items-center justify-center rounded border border-amber-400/40 bg-amber-400/10 text-xs">
               POS
@@ -152,7 +152,7 @@ export default function Navbar() {
                 <div key={link.label} className="relative" ref={dropdownRef}>
                   <button
                     onClick={() => setReportsOpen((v) => !v)}
-                    className={`relative flex items-center gap-1 px-4 py-1.5 font-mono text-xs tracking-wider uppercase transition ${
+                    className={`relative flex items-center gap-1 px-4 py-1.5 font-mono text-md tracking-wider uppercase transition ${
                       childActive || reportsOpen
                         ? "text-amber-400"
                         : "text-zinc-400 hover:text-zinc-100"
@@ -232,7 +232,7 @@ export default function Navbar() {
 
           <button
             onClick={logout}
-            className="hidden sm:block rounded border border-red-500/30 bg-red-500/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest text-red-400 hover:bg-red-500/20 transition"
+            className="hidden sm:block rounded border border-red-500/30 bg-red-500/10 px-3 py-1.5 font-mono text-[11px] uppercase tracking-widest text-red-400 hover:bg-red-500/20 transition"
           >
             Logout
           </button>
@@ -255,7 +255,7 @@ export default function Navbar() {
                 <div key={link.label} className="flex flex-col">
                   <button
                     onClick={() => setMobileReportsOpen((v) => !v)}
-                    className={`flex items-center justify-between rounded px-3 py-2 font-mono text-xs uppercase tracking-widest transition ${
+                    className={`flex items-center justify-between rounded px-3 py-2 font-mono text-sm uppercase tracking-widest transition ${
                       childActive
                         ? "bg-amber-400/10 text-amber-400"
                         : "text-zinc-400 hover:bg-white/5 hover:text-zinc-100"
