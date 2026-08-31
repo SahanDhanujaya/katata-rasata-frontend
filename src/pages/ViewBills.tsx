@@ -164,7 +164,7 @@ export default function ViewBills() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="rounded-lg border border-amber-400/20 bg-amber-400/5 px-6 py-4">
             <p className="font-mono text-[10px] tracking-widest text-zinc-500 uppercase">
-              Visible Page Total
+              Range Total
             </p>
             <p className="font-mono text-xl font-bold text-amber-400">
               Rs. {totalRangeSales.toLocaleString()}
