@@ -34,12 +34,31 @@ export default function Billing() {
   // Track if mobile cart is visible
   const [showMobileCart, setShowMobileCart] = useState(false);
 
-  const generateInvoiceId = () => {
-    const datePart = new Date().getTime().toString().slice(-4);
-    // eslint-disable-next-line react-hooks/purity
-    const randomPart = Math.floor(1000 + Math.random() * 9000);
-    return `INV-${datePart}-${randomPart}`;
-  };
+  const generateInvoiceId = async () => {
+  const datePart = new Date().getTime().toString().slice(-4);
+
+  try {
+    const lastInvoiceRes = await axios.get(`${BASE_URL}/sales/last-invoice`);
+    const lastInvoiceId = lastInvoiceRes.data?.orderId;
+
+    if (lastInvoiceId) {
+      const parts = lastInvoiceId.split("-");
+      const lastSeq = parseInt(parts[2], 10);
+
+      if (lastSeq >= 0) {
+        // Same date batch — increment, roll over to 000 after 999
+        const nextSeq = lastSeq >= 999 ? 0 : lastSeq + 1;
+        const seqStr = nextSeq.toString().padStart(3, "0");
+        return `INV-${datePart}-${seqStr}`;
+      }
+    }
+  } catch (err) {
+    console.error("Failed to fetch last invoice, falling back:", err);
+  }
+
+  // First invoice of this date batch (or fetch failed) — start at 001
+  return `INV-${datePart}-001`;
+};
 
   useEffect(() => {
     const getItems = async () => {
@@ -113,7 +132,7 @@ export default function Billing() {
     setLoading(true);
 
     // Generate ONE invoice ID and snapshot the cart/total before anything changes
-    const invoiceId = generateInvoiceId();
+    const invoiceId = await generateInvoiceId();
     const orderSnapshot = [...cart];
     const totalSnapshot = total;
 
