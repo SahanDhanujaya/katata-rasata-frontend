@@ -180,14 +180,14 @@ export default function Billing() {
             placeholder="Search items..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded border border-white/10 bg-zinc-800 px-3 py-2.5 font-mono text-xs text-zinc-100 placeholder-zinc-500 outline-none focus:border-amber-400/40 transition"
+            className="w-full rounded border border-white/10 bg-zinc-800 px-3 py-2.5 font-mono text-md text-zinc-100 placeholder-zinc-500 outline-none focus:border-amber-400/40 transition"
           />
           <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`whitespace-nowrap rounded-full px-4 py-1.5 font-mono text-[10px] tracking-widest uppercase transition-all border
+                className={`whitespace-nowrap rounded-full px-4 py-1.5 font-mono text-[13px] tracking-widest uppercase transition-all border
                   ${
                     activeCategory === cat
                       ? "bg-amber-400 border-amber-400 text-zinc-900 font-bold"
@@ -203,7 +203,7 @@ export default function Billing() {
         {/* Items Grid */}
         <div className="flex-1 overflow-y-auto p-3 lg:p-4">
           {filtered.length === 0 ? (
-            <div className="flex h-full items-center justify-center font-mono text-xs tracking-widest text-zinc-600 uppercase">
+            <div className="flex h-full items-center justify-center font-mono text-md tracking-widest text-zinc-600 uppercase">
               No items found
             </div>
           ) : (
@@ -217,17 +217,17 @@ export default function Billing() {
                     className="group relative flex flex-col items-start rounded-lg border border-white/10 bg-zinc-900 p-3 lg:p-4 text-left transition-all hover:border-amber-400/40 active:scale-[0.97]"
                   >
                     {inCart && (
-                      <span className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-amber-400 font-mono text-[10px] font-bold text-zinc-900 animate-in zoom-in">
+                      <span className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-amber-400 font-mono text-[14px] font-bold text-zinc-900 animate-in zoom-in">
                         {inCart.qty}
                       </span>
                     )}
-                    <span className="mb-1 font-mono text-[9px] tracking-widest text-amber-400/60 uppercase">
+                    <span className="mb-1 font-mono text-[10px] tracking-widest text-amber-400/60 uppercase">
                       {item.category}
                     </span>
-                    <span className="mb-2 font-mono text-xs lg:text-sm leading-snug text-zinc-100 line-clamp-2">
+                    <span className="mb-2 font-mono text-lg lg:text-md leading-snug text-zinc-100 line-clamp-2">
                       {item.name}
                     </span>
-                    <span className="mt-auto font-mono text-sm lg:text-base font-bold text-amber-400">
+                    <span className="mt-auto font-mono text-lg lg:text-base font-bold text-amber-400">
                       Rs.{item.price}
                     </span>
                   </button>
