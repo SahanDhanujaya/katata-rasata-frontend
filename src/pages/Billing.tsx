@@ -35,30 +35,30 @@ export default function Billing() {
   const [showMobileCart, setShowMobileCart] = useState(false);
 
   const generateInvoiceId = async () => {
-  const datePart = new Date().getTime().toString().slice(-4);
+    const datePart = new Date().getTime().toString().slice(-4);
 
-  try {
-    const lastInvoiceRes = await axios.get(`${BASE_URL}/sales/last-invoice`);
-    const lastInvoiceId = lastInvoiceRes.data?.orderId;
+    try {
+      const lastInvoiceRes = await axios.get(`${BASE_URL}/sales/last-invoice`);
+      const lastInvoiceId = lastInvoiceRes.data?.orderId;
 
-    if (lastInvoiceId) {
-      const parts = lastInvoiceId.split("-");
-      const lastSeq = parseInt(parts[2], 10);
+      if (lastInvoiceId) {
+        const parts = lastInvoiceId.split("-");
+        const lastSeq = parseInt(parts[2], 10);
 
-      if (lastSeq >= 0) {
-        // Same date batch — increment, roll over to 000 after 999
-        const nextSeq = lastSeq >= 999 ? 0 : lastSeq + 1;
-        const seqStr = nextSeq.toString().padStart(3, "0");
-        return `INV-${datePart}-${seqStr}`;
+        if (lastSeq >= 0) {
+          // Same date batch — increment, roll over to 000 after 999
+          const nextSeq = lastSeq >= 999 ? 0 : lastSeq + 1;
+          const seqStr = nextSeq.toString().padStart(3, "0");
+          return `INV-${datePart}-${seqStr}`;
+        }
       }
+    } catch (err) {
+      console.error("Failed to fetch last invoice, falling back:", err);
     }
-  } catch (err) {
-    console.error("Failed to fetch last invoice, falling back:", err);
-  }
 
-  // First invoice of this date batch (or fetch failed) — start at 001
-  return `INV-${datePart}-001`;
-};
+    // First invoice of this date batch (or fetch failed) — start at 001
+    return `INV-${datePart}-001`;
+  };
 
   useEffect(() => {
     const getItems = async () => {
@@ -188,10 +188,9 @@ export default function Billing() {
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
                 className={`whitespace-nowrap rounded-full px-4 py-1.5 font-mono text-[13px] tracking-widest uppercase transition-all border
-                  ${
-                    activeCategory === cat
-                      ? "bg-amber-400 border-amber-400 text-zinc-900 font-bold"
-                      : "border-white/10 text-zinc-400"
+                  ${activeCategory === cat
+                    ? "bg-amber-400 border-amber-400 text-zinc-900 font-bold"
+                    : "border-white/10 text-zinc-400"
                   }`}
               >
                 {cat}
@@ -224,10 +223,10 @@ export default function Billing() {
                     <span className="mb-1 font-mono text-[10px] tracking-widest text-amber-400/60 uppercase">
                       {item.category}
                     </span>
-                    <span className="mb-2 font-mono text-lg lg:text-md leading-snug text-zinc-100 line-clamp-2">
+                    <span className="mb-2 font-mono text-lg lg:text-xl leading-snug text-zinc-100 line-clamp-2">
                       {item.name}
                     </span>
-                    <span className="mt-auto font-mono text-lg lg:text-base font-bold text-amber-400">
+                    <span className="mt-auto font-mono text-xl lg:text-xl font-bold text-amber-400">
                       Rs.{item.price}
                     </span>
                   </button>
@@ -278,7 +277,7 @@ export default function Billing() {
                 className="rounded-lg border border-white/10 bg-zinc-800/40 px-3 py-2.5"
               >
                 <div className="mb-2 flex items-start justify-between gap-2">
-                  <span className="font-mono text-xs text-zinc-200">
+                  <span className="font-mono text-lg text-zinc-200">
                     {c.name}
                   </span>
                   <button
@@ -306,7 +305,7 @@ export default function Billing() {
                       +
                     </button>
                   </div>
-                  <span className="font-mono text-xs font-bold text-amber-400">
+                  <span className="font-mono text-sm font-bold text-amber-400">
                     Rs.{c.price * c.qty}
                   </span>
                 </div>
@@ -336,7 +335,7 @@ export default function Billing() {
             <button
               onClick={checkout}
               disabled={!cart.length || loading}
-              className="w-full rounded-lg border border-white/10 py-3 font-mono text-[10px] tracking-widest text-zinc-400 uppercase disabled:opacity-40"
+              className="bg-amber-300 w-full rounded-lg border border-white/10 py-3 font-mono text-[12px] tracking-widest text-black uppercase disabled:opacity-40"
             >
               {loading ? "Saving..." : "Save & Print Receipt"}
             </button>
