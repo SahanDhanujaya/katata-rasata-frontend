@@ -1,23 +1,52 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useState } from "react";
-import { toast } from "react-toastify";
+import { useState, useRef, useEffect } from "react";
 // import ThemeToggle from "./ThemeToggle";
+import { toast } from "react-toastify";
 
+// Simple links render directly. Links with `children` render as a dropdown
+// (desktop: hover/click flyout, mobile: inline accordion).
 const navLinks = [
   { to: "/", label: "Billing" },
   { to: "/add", label: "Items" },
-  { to: "/report", label: "Report" },
+  { to: "/history", label: "History" },
+  {
+    label: "Reports",
+    children: [
+      { to: "/analyze", label: "Analyze" },
+      { to: "/expenses", label: "Manage Expenses" },
+      { to: "/deposits", label: "Deposits (Uber, etc.)" },
+    ],
+  },
 ];
 
 export default function Navbar() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false); // mobile menu
+  const [reportsOpen, setReportsOpen] = useState(false); // desktop dropdown
+  const [mobileReportsOpen, setMobileReportsOpen] = useState(false); // mobile accordion
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
-  
+  // Close the desktop dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setReportsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Close the desktop dropdown whenever the route changes
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setReportsOpen(false);
+    setOpen(false);
+  }, [pathname]);
 
   const logout = () => {
     toast(
@@ -115,13 +144,71 @@ export default function Navbar() {
         {/* Desktop Links */}
 
         <div className="hidden md:flex items-center gap-1">
-          {navLinks.map(({ to, label }) => {
-            const active = pathname === to;
+          {navLinks.map((link) => {
+            if (link.children) {
+              const childActive = link.children.some((c) => c.to === pathname);
+
+              return (
+                <div key={link.label} className="relative" ref={dropdownRef}>
+                  <button
+                    onClick={() => setReportsOpen((v) => !v)}
+                    className={`relative flex items-center gap-1 px-4 py-1.5 font-mono text-xs tracking-wider uppercase transition ${
+                      childActive || reportsOpen
+                        ? "text-amber-400"
+                        : "text-zinc-400 hover:text-zinc-100"
+                    }`}
+                  >
+                    {(childActive || reportsOpen) && (
+                      <span className="absolute inset-0 rounded bg-amber-400/10 ring-1 ring-amber-400/30" />
+                    )}
+                    <span className="relative z-10">{link.label}</span>
+                    <span
+                      className={`relative z-10 text-[8px] transition-transform ${
+                        reportsOpen ? "rotate-180" : ""
+                      }`}
+                    >
+                      ▼
+                    </span>
+                  </button>
+
+                  {/* Dropdown panel */}
+                  <div
+                    className={`absolute right-0 mt-2 w-52 origin-top-right rounded-lg border border-white/10 bg-zinc-900 shadow-xl shadow-black/40 transition-all ${
+                      reportsOpen
+                        ? "opacity-100 scale-100 pointer-events-auto"
+                        : "opacity-0 scale-95 pointer-events-none"
+                    }`}
+                  >
+                    <div className="flex flex-col p-1.5">
+                      {link.children.map((child) => {
+                        const active = pathname === child.to;
+                        return (
+                          <Link
+                            key={child.to}
+                            to={child.to}
+                            onClick={() => setReportsOpen(false)}
+                            className={`rounded px-3 py-2 font-mono text-[11px] uppercase tracking-widest transition ${
+                              active
+                                ? "bg-amber-400/10 text-amber-400"
+                                : "text-zinc-400 hover:bg-white/5 hover:text-zinc-100"
+                            }`}
+                          >
+                            {child.label}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
+            const active = pathname === link.to;
 
             return (
               <Link
-                key={to}
-                to={to}
+                key={link.to}
+                to={link.to as string}
                 className={`relative px-4 py-1.5 font-mono text-xs tracking-wider uppercase transition ${
                   active
                     ? "text-amber-400"
@@ -132,7 +219,7 @@ export default function Navbar() {
                   <span className="absolute inset-0 rounded bg-amber-400/10 ring-1 ring-amber-400/30" />
                 )}
 
-                <span className="relative z-10">{label}</span>
+                <span className="relative z-10">{link.label}</span>
               </Link>
             );
           })}
@@ -156,17 +243,67 @@ export default function Navbar() {
 
       <div
         className={`md:hidden transition-all duration-300 ${
-          open ? "max-h-96 opacity-100" : "max-h-0 opacity-0 overflow-hidden"
+          open ? "max-h-[28rem] opacity-100" : "max-h-0 opacity-0 overflow-hidden"
         }`}
       >
         <div className="border-t border-white/10 bg-zinc-950 px-4 py-3 flex flex-col gap-2">
-          {navLinks.map(({ to, label }) => {
-            const active = pathname === to;
+          {navLinks.map((link) => {
+            if (link.children) {
+              const childActive = link.children.some((c) => c.to === pathname);
+
+              return (
+                <div key={link.label} className="flex flex-col">
+                  <button
+                    onClick={() => setMobileReportsOpen((v) => !v)}
+                    className={`flex items-center justify-between rounded px-3 py-2 font-mono text-xs uppercase tracking-widest transition ${
+                      childActive
+                        ? "bg-amber-400/10 text-amber-400"
+                        : "text-zinc-400 hover:bg-white/5 hover:text-zinc-100"
+                    }`}
+                  >
+                    <span>{link.label}</span>
+                    <span
+                      className={`text-[8px] transition-transform ${
+                        mobileReportsOpen ? "rotate-180" : ""
+                      }`}
+                    >
+                      ▼
+                    </span>
+                  </button>
+
+                  <div
+                    className={`flex flex-col gap-1 overflow-hidden transition-all ${
+                      mobileReportsOpen ? "max-h-40 mt-1 pl-3" : "max-h-0"
+                    }`}
+                  >
+                    {link.children.map((child) => {
+                      const active = pathname === child.to;
+                      return (
+                        <Link
+                          key={child.to}
+                          to={child.to}
+                          onClick={() => setOpen(false)}
+                          className={`rounded px-3 py-2 font-mono text-[11px] uppercase tracking-widest transition border-l border-white/10 ${
+                            active
+                              ? "bg-amber-400/10 text-amber-400"
+                              : "text-zinc-500 hover:bg-white/5 hover:text-zinc-100"
+                          }`}
+                        >
+                          {child.label}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            }
+
+            const active = pathname === link.to;
 
             return (
               <Link
-                key={to}
-                to={to}
+                key={link.to}
+                to={link.to as string}
                 onClick={() => setOpen(false)}
                 className={`rounded px-3 py-2 font-mono text-xs uppercase tracking-widest transition ${
                   active
@@ -174,7 +311,7 @@ export default function Navbar() {
                     : "text-zinc-400 hover:bg-white/5 hover:text-zinc-100"
                 }`}
               >
-                {label}
+                {link.label}
               </Link>
             );
           })}

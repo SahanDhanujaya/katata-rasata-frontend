@@ -378,9 +378,9 @@ export default function Billing() {
       {/* ── PRINT STYLES & AREA (browser-print fallback) ── */}
       <div className="hidden print:block print-area w-full p-8 bg-white text-black font-mono">
         <div className="text-center border-b border-black pb-4 mb-4 border-dotted">
-          <h1 className="text-xl font-bold uppercase">Laka's Take Away</h1>
-          <p className="text-xs">Horana road Wadaka panadura</p>
-          <span>0763243716</span>
+          <h1 className="text-xl font-bold uppercase">HOTEL KATATA RASATA</h1>
+          <p className="text-xs">No:20/7/8/9 Private Bus Stand, Panadura</p>
+          <span>0722838281</span>
           <p className="text-xs">{new Date().toLocaleString()}</p>
           <p>ID: {printSnapshot?.invoiceId}</p>
         </div>

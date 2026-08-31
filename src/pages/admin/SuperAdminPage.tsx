@@ -12,6 +12,7 @@ interface BillItem {
 
 interface Bill {
   _id: string;
+  orderId: string;
   date: string;
   totalAmount: number;
   items: BillItem[];
@@ -167,7 +168,7 @@ export default function SuperAdminPage() {
               }
               className="font-mono text-[9px] uppercase tracking-widest text-zinc-500"
             >
-              Laka's Take away — Order Management
+              Hotel Katata Rasata — Order Management
             </span>
           </div>
           <h2 className="font-mono text-xl sm:text-2xl font-bold tracking-tighter text-amber-400 uppercase">
@@ -273,7 +274,7 @@ export default function SuperAdminPage() {
                           Receipt #
                         </span>
                         <span className="font-mono text-xs text-zinc-500">
-                          #{bill._id?.slice(-6).toUpperCase()}
+                          #{bill.orderId.toUpperCase()}
                         </span>
                       </div>
                     </div>
