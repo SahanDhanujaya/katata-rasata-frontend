@@ -74,33 +74,33 @@ export default function ViewBills() {
   // );
 
   function printBill(bill: any): void {
-  if (!bill?._id) {
-    alert("Invalid bill ID");
-    return;
+    if (!bill?._id) {
+      alert("Invalid bill ID");
+      return;
+    }
+
+    // Backend route:
+    // GET /api/print/bill/:saleId
+    const responseUrl = `${BASE_URL}/print/bill/${bill._id}`;
+
+    console.log("Printing bill:", responseUrl);
+
+    // Android Bluetooth Print app
+    const bluetoothPrintUrl =
+      `my.bluetoothprint.scheme://${responseUrl}`;
+
+    // Detect Android
+    const isAndroid = /Android/i.test(navigator.userAgent);
+
+    if (isAndroid) {
+      // eslint-disable-next-line react-hooks/immutability
+      window.location.href = bluetoothPrintUrl;
+      return;
+    }
+
+    // Desktop fallback
+    window.print();
   }
-
-  // Backend route:
-  // GET /api/print/bill/:saleId
-  const responseUrl = `${BASE_URL}/print/bill/${bill._id}`;
-
-  console.log("Printing bill:", responseUrl);
-
-  // Android Bluetooth Print app
-  const bluetoothPrintUrl =
-    `my.bluetoothprint.scheme://${responseUrl}`;
-
-  // Detect Android
-  const isAndroid = /Android/i.test(navigator.userAgent);
-
-  if (isAndroid) {
-    // eslint-disable-next-line react-hooks/immutability
-    window.location.href = bluetoothPrintUrl;
-    return;
-  }
-
-  // Desktop fallback
-  window.print();
-}
 
   return (
     <div className="min-h-[calc(100vh-56px)] bg-zinc-950 p-4 sm:p-6 text-zinc-100 print:bg-white print:p-0 print:text-black">
@@ -203,10 +203,10 @@ export default function ViewBills() {
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 border-b border-white/5">
                     <div className="flex flex-wrap gap-4">
                       <div className="flex flex-col">
-                        <span className="font-mono text-[9px] text-zinc-500 uppercase">
+                        <span className="font-mono text-[10px] text-zinc-500 uppercase">
                           Date/Time
                         </span>
-                        <span className="font-mono text-xs text-zinc-200">
+                        <span className="font-mono text-mdjyj   text-zinc-200">
                           {new Date(bill.date).toLocaleDateString()} —{" "}
                           {new Date(bill.date).toLocaleTimeString([], {
                             hour: "2-digit",
@@ -215,19 +215,19 @@ export default function ViewBills() {
                         </span>
                       </div>
                       <div className="flex flex-col">
-                        <span className="font-mono text-[9px] text-zinc-500 uppercase">
+                        <span className="font-mono text-[10px] text-zinc-500 uppercase">
                           Receipt #
                         </span>
-                        <span className="font-mono text-xs text-zinc-500">
+                        <span className="font-mono text-md text-zinc-500">
                           #{bill.orderId?.toUpperCase()}
                         </span>
                       </div>
                     </div>
                     <div className="text-left sm:text-right">
-                      <span className="font-mono text-[9px] text-zinc-500 uppercase">
+                      <span className="font-mono text-[10px] text-zinc-500 uppercase">
                         Grand Total
                       </span>
-                      <p className="font-mono text-md font-bold text-amber-400">
+                      <p className="font-mono text-lg font-bold text-amber-400">
                         Rs. {bill.totalAmount.toLocaleString()}
                       </p>
                     </div>
@@ -248,8 +248,8 @@ export default function ViewBills() {
                           key={idx}
                           className="flex justify-between font-mono text-[11px]"
                         >
-                          <span className="text-zinc-400">
-                            {item.name}{" "}
+                          <span className="text-zinc-400 text-lg">
+                            {item.display_name}{" "}
                             <span className="text-zinc-600 ml-1">
                               ×{item.qty}
                             </span>
