@@ -9,6 +9,7 @@ const ITEMS_PER_PAGE = 8; // Adjust this number as needed
 
 interface Item {
   _id: string;
+  display_name: string;
   name: string;
   price: number;
   category: string;
@@ -17,7 +18,7 @@ interface Item {
 export default function AddItem() {
   const [items, setItems] = useState<Item[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState({ name: "", price: "", category: "" });
+  const [form, setForm] = useState({ display_name: "", name: "", price: "", category: "" });
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -53,13 +54,13 @@ export default function AddItem() {
 
   const handleEdit = (item: Item) => {
     setEditingId(item._id);
-    setForm({ name: item.name, price: item.price.toString(), category: item.category });
+    setForm({ display_name: item.display_name, name: item.name, price: item.price.toString(), category: item.category });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const cancelEdit = () => {
     setEditingId(null);
-    setForm({ name: "", price: "", category: "" });
+    setForm({ display_name: "", name: "", price: "", category: "" });
   };
 
   const submit = async (e: React.FormEvent) => {
@@ -71,7 +72,7 @@ export default function AddItem() {
       if (editingId) await axios.put(`${BASE_URL}/items/${editingId}`, payload);
       else await axios.post(`${BASE_URL}/items`, payload);
       setSaved(true);
-      setForm({ name: "", price: "", category: "" });
+      setForm({ display_name: "", name: "", price: "", category: "" });
       setEditingId(null);
       fetchItems();
       setTimeout(() => setSaved(false), 3000);
@@ -90,7 +91,7 @@ export default function AddItem() {
 
   return (
     <div className="flex flex-col lg:flex-row min-h-[calc(100vh-56px)] lg:h-[calc(100vh-56px)] bg-zinc-950 text-zinc-100 overflow-x-hidden">
-      
+
       {/* ── LEFT: Add/Edit Form ── */}
       <div className="w-full lg:w-96 bg-zinc-900 p-6 lg:p-8 shadow-2xl border-b lg:border-b-0 lg:border-r border-white/10 order-1 lg:order-2">
         <div className="mb-6 lg:mb-8 text-center lg:text-left">
@@ -109,6 +110,17 @@ export default function AddItem() {
               type="text"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
+              className="w-full rounded border border-white/10 bg-zinc-800 px-4 py-3 font-mono text-sm outline-none focus:border-amber-400/40 transition"
+              required
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="font-mono text-[10px] tracking-widest text-zinc-500 uppercase px-1">Display Name</label>
+            <input
+              type="text"
+              value={form.display_name}
+              onChange={(e) => setForm({ ...form, display_name: e.target.value })}
               className="w-full rounded border border-white/10 bg-zinc-800 px-4 py-3 font-mono text-sm outline-none focus:border-amber-400/40 transition"
               required
             />
@@ -172,10 +184,10 @@ export default function AddItem() {
             <h2 className="font-mono text-lg font-bold tracking-tighter text-amber-400 uppercase">Inventory</h2>
             <p className="font-mono text-[9px] tracking-widest text-zinc-500 uppercase">{filteredItems.length} Result(s)</p>
           </div>
-          
+
           {/* Search Input */}
           <div className="w-full sm:w-64">
-            <input 
+            <input
               type="text"
               placeholder="SEARCH INVENTORY..."
               value={searchTerm}
@@ -201,7 +213,7 @@ export default function AddItem() {
                   currentItems.map((item) => (
                     <tr key={item._id} className={`group hover:bg-white/5 transition-colors ${editingId === item._id ? 'bg-amber-400/10' : ''}`}>
                       <td className="px-2 lg:px-4 py-3">
-                        <div className="text-zinc-200 font-bold sm:font-normal">{item.name}</div>
+                        <div className="text-zinc-200 font-bold sm:font-normal">{item.display_name}</div>
                         <div className="sm:hidden text-[9px] text-amber-400/60">{item.category}</div>
                       </td>
                       <td className="hidden sm:table-cell px-4 py-3">
@@ -234,19 +246,19 @@ export default function AddItem() {
 
         {/* ── PAGINATION FOOTER ── */}
         <div className="border-t border-white/10 bg-zinc-900/60 px-6 py-3 flex justify-between items-center">
-          <button 
+          <button
             disabled={currentPage === 1}
             onClick={() => setCurrentPage(p => p - 1)}
             className="font-mono text-[10px] text-zinc-500 hover:text-amber-400 disabled:opacity-20 uppercase tracking-widest transition"
           >
             Previous
           </button>
-          
+
           <div className="font-mono text-[10px] text-zinc-500 uppercase tracking-widest">
             Page <span className="text-amber-400">{currentPage}</span> of {totalPages || 1}
           </div>
 
-          <button 
+          <button
             disabled={currentPage === totalPages || totalPages === 0}
             onClick={() => setCurrentPage(p => p + 1)}
             className="font-mono text-[10px] text-zinc-500 hover:text-amber-400 disabled:opacity-20 uppercase tracking-widest transition"

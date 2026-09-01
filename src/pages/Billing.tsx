@@ -8,6 +8,7 @@ const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 interface Item {
   _id: string;
   name: string;
+  display_name: string;
   price: number;
   category: string;
 }
@@ -224,7 +225,7 @@ export default function Billing() {
                       {item.category}
                     </span>
                     <span className="mb-2 font-mono text-lg lg:text-xl leading-snug text-zinc-100 line-clamp-2">
-                      {item.name}
+                      {item.display_name}
                     </span>
                     <span className="mt-auto font-mono text-xl lg:text-xl font-bold text-amber-400">
                       Rs.{item.price}
@@ -278,7 +279,7 @@ export default function Billing() {
               >
                 <div className="mb-2 flex items-start justify-between gap-2">
                   <span className="font-mono text-lg text-zinc-200">
-                    {c.name}
+                    {c.display_name}
                   </span>
                   <button
                     onClick={() => removeItem(c._id)}
@@ -387,7 +388,7 @@ export default function Billing() {
           <tbody>
             {printSnapshot?.cart.map((c) => (
               <tr key={c._id} className="border-b border-gray-200">
-                <td className="py-2">{c.name}</td>
+                <td className="py-2">{c.display_name}</td>
                 <td className="py-2 text-center">{c.qty}</td>
                 <td className="py-2 text-right">Rs.{c.price * c.qty}</td>
               </tr>
